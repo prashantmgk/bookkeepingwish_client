@@ -48,8 +48,8 @@ function App() {
               <Route path="/membership" element={<Membership/>} />
               <Route path="/promotersCapital" element={<PromotersCapital/>} />
               <Route path="/newInvestment" element={<NewInvestment/>} />
-              {/* <Route path="/billReport" element={<BillExpenseReportTab/>} />
-              <Route path="/billCategory" element={<CategoryReport/>} /> */}
+               <Route path="/billReport" element={<BillExpenseReportTab/>} />
+              {/*<Route path="/billCategory" element={<CategoryReport/>} /> */}
               {/* <Route path="/billType" element={<BillTypeReport/>} /> */}
               <Route path="/salaryReport" element={<SalaryReport/>} />
               <Route path="/investorReport" element={<PromotersCapitalReport/>} />

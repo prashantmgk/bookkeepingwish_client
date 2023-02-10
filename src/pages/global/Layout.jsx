@@ -157,7 +157,8 @@ const Layout = ({window, children}) => {
             </IconButton>
             <Typography variant="h5" 
                sx={{
-                  color: colors.grey[100]
+                  color: colors.grey[100],
+                  display: { xs: 'none', sm: 'block' },
                }}
             >
                West Indoor Sport Hub Pvt. Ltd.

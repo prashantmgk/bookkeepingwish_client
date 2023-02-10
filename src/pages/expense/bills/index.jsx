@@ -289,7 +289,7 @@ const VatBill = () => {
                InputProps={{
                   startAdornment: <InputAdornment position="start">Rs.</InputAdornment>,
                   endAdornment: <InputAdornment position="end">
-                     {(values.billsType === "vat" ? "13% VAT will be auto included" : "")}
+                     {(values.billsType === "vat" ? "13% VAT auto inc." : "")}
                   </InputAdornment>,
                }}
                
