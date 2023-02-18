@@ -5,7 +5,7 @@ import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
 import {useLazyQuery} from "@apollo/client";
-import {GET_SALARY_BY_EMPLOYEE_AND_FISCAL_YEAR} from "../../../queries/salaryQueries";
+import {GET_SALARY_BY_EMPLOYEE_NAME} from "../../../queries/salaryQueries";
 import LoadingScreen from "../../../components/Backdrop";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -34,7 +34,7 @@ const SalaryReport = () => {
 
    const [name, setName] = useState("");
    const [fiscalYear, setFiscalYear] = useState("");
-   const [loadSalaryData, { loading, data }] = useLazyQuery(GET_SALARY_BY_EMPLOYEE_AND_FISCAL_YEAR, {
+   const [loadSalaryData, { loading, data }] = useLazyQuery(GET_SALARY_BY_EMPLOYEE_NAME, {
    });
    
    const theme = useTheme();
@@ -85,6 +85,7 @@ const SalaryReport = () => {
    ];
 
    if(loading) return <LoadingScreen />
+   const rows = data?.getSalaryByEmployeeName || [];
 
    return(
       <Box 
@@ -201,9 +202,8 @@ const SalaryReport = () => {
             }}
             >
             {
-               data ?
                <DataGrid 
-                  rows={data.getSalaryByEmployeeNameFromFiscalYear} 
+                  rows={rows} 
                   getRowId={row => row.id} 
                   columns={columns}
                   density="compact"
@@ -211,7 +211,6 @@ const SalaryReport = () => {
                      Toolbar: CustomToolbar,
                   }}
                />
-               : null
             }
             
          </Box>

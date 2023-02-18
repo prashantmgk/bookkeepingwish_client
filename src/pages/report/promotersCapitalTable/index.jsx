@@ -91,7 +91,7 @@ const PromotersCapitalReport = () => {
          headerAlign: "center",
          renderCell: (params) => (
             <Typography color={colors.greenAccent[500]}>
-              {(`${(params.row.capitalPercentage)} %`).toUpperCase()}
+              {(`${(params.row.capitalPercentage).toFixed(2)} %`).toUpperCase()}
             </Typography>
           ),
       },

@@ -72,18 +72,8 @@ const VatBill = () => {
       resetForm({values: INITIAL_FORM_STATE});
    };
 
-   const updateCache = (cache, { data: { addBill } }) => {
-      const data = cache.readQuery({ query: GET_CUSTOMER_ENTRIES });
-      data.investors.push(addBill);
-      cache.writeQuery({
-        query: GET_CUSTOMER_ENTRIES,
-        data
-      });
-    };
-
    // ADDING BILL TO SERVER DATABASE 
    const [addBill, {loading, data}] = useMutation(ADD_BILL, {
-      update: updateCache,    
    });
 
 

@@ -38,7 +38,7 @@ const FORM_VALIDATION = Yup.object().shape({
    perBelay: Yup.number(),
    totalBelay: Yup.number(),
    charges: Yup.number(),
-   date: Yup.string().required("Required"),
+   date: Yup.date().required("Required"),
 })
 
 const Salary = () => {

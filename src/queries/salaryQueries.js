@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-const GET_SALARY_BY_EMPLOYEE_AND_FISCAL_YEAR = gql`
+const GET_SALARY_BY_EMPLOYEE_NAME = gql`
 query Query($employeeName: String!, $fiscalYear: String!) {
-   getSalaryByEmployeeNameFromFiscalYear(employeeName: $employeeName, fiscalYear: $fiscalYear) {
+  getSalaryByEmployeeName(employeeName: $employeeName, fiscalYear: $fiscalYear) {
       id
       employeeName
       date
@@ -42,4 +42,4 @@ query Query($position: String!) {
 }
 `
 
-export { GET_SALARY_BY_EMPLOYEE_AND_FISCAL_YEAR, GET_SALARY_BY_POSITION };
+export { GET_SALARY_BY_EMPLOYEE_NAME, GET_SALARY_BY_POSITION };

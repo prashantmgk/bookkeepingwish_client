@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { DataGrid,  GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
@@ -6,6 +6,10 @@ import { useState } from "react";
 import {useQuery} from "@apollo/client";
 import {GET_BILLS_BY_TYPE} from "../../../../queries/billQueries";
 import LoadingScreen from "../../../../components/Backdrop";
+
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 function CustomToolbar() {
 
@@ -26,11 +30,18 @@ function CustomToolbar() {
 
 const BillTypeReport = () => {
 
-   const [billType, setBillType] = useState("vat");
-   const {loading, data} = useQuery(GET_BILLS_BY_TYPE, {
-      variables: {billsType: billType}
+   const defaultFiscalYear = new Date().getFullYear().toString();
 
-   }, [billType]);
+   const [billType, setBillType] = useState("vat");
+   const [fiscalYear, setFiscalYear] = useState(defaultFiscalYear);
+   
+   const {loading, data} = useQuery(GET_BILLS_BY_TYPE, {
+      variables: {
+         billsType: billType,
+         fiscalYear: fiscalYear,
+      }
+
+   }, [billType, fiscalYear]);
    
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
@@ -108,11 +119,6 @@ const BillTypeReport = () => {
       
    ];
 
-   
-   const handleChange = (event) => {
-      setBillType(event.target.value);
-   };
-
    if (loading) return <LoadingScreen/>;
 
    return(
@@ -155,7 +161,7 @@ const BillTypeReport = () => {
             <Select
                value={billType}
                label="Bill Type"
-               onChange={handleChange}
+               onChange={e => setBillType(e.target.value)}
                displayEmpty
                inputProps={{ 'aria-label': 'Without label' }}
                
@@ -165,6 +171,35 @@ const BillTypeReport = () => {
                <MenuItem value={"pettycash"}>Petty Cash</MenuItem>
             </Select>
          </FormControl>
+         <Box
+            sx={{
+               gridColumn: {xs:"span 3" , lg: "span 2"},
+               display: "flex"
+            }}
+         >
+            <LocalizationProvider dateAdapter={AdapterDayjs}
+               sx={{
+                  width: "100%",
+               }}
+            >
+               <DatePicker
+                  views={['year']}
+                  label="Fiscal Year"
+                  value={fiscalYear}
+                  onChange={(newDate) => {
+                     setFiscalYear((newDate.$y).toString());
+                  }}
+
+                  InputLabelProps={{
+                     style: { color: colors.grey[100] },
+                  }}
+                  
+                  renderInput={(params) => <TextField {...params} helperText={null} />}
+               />
+            </LocalizationProvider>
+
+         </Box>
+         
 
          <Box
             m="10px 0 0 0"

@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
@@ -6,6 +6,10 @@ import { useState } from "react";
 import {useQuery} from "@apollo/client";
 import {GET_BILLS_BY_CATEGORY} from "../../../../queries/billQueries";
 import LoadingScreen from "../../../../components/Backdrop";
+
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 function CustomToolbar() {
 
@@ -26,11 +30,17 @@ function CustomToolbar() {
 
 const BillCategoryReport = () => {
 
-   const [category, setCategory] = useState("accomodation");
-   const {loading, data} = useQuery(GET_BILLS_BY_CATEGORY, {
-      variables: {category: category}
+   const defaultFiscalYear = new Date().getFullYear().toString();
 
-   }, [category]);
+   const [category, setCategory] = useState("accomodation");
+   const [fiscalYear, setFiscalYear] = useState(defaultFiscalYear);
+
+   const {loading, data} = useQuery(GET_BILLS_BY_CATEGORY, {
+      variables: {
+         category: category,
+         fiscalYear: fiscalYear,
+      }
+   }, [category, fiscalYear]);
    
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
@@ -96,10 +106,6 @@ const BillCategoryReport = () => {
       
    ];
 
-   
-   const handleChange = (event) => {
-      setCategory(event.target.value);
-   };
 
    if (loading) return <LoadingScreen/>;
 
@@ -143,7 +149,7 @@ const BillCategoryReport = () => {
             <Select
                value={category}
                label="Category"
-               onChange={handleChange}
+               onChange={e => setCategory(e.target.value)}
                displayEmpty
                inputProps={{ 'aria-label': 'Without label' }}
                
@@ -161,6 +167,35 @@ const BillCategoryReport = () => {
                <MenuItem value={"partycash"}>Party's Cash</MenuItem>
             </Select>
          </FormControl>
+
+         <Box
+            sx={{
+               gridColumn: {xs:"span 3" , lg: "span 2"},
+               display: "flex"
+            }}
+         >
+            <LocalizationProvider dateAdapter={AdapterDayjs}
+               sx={{
+                  width: "100%",
+               }}
+            >
+               <DatePicker
+                  views={['year']}
+                  label="Fiscal Year"
+                  value={fiscalYear}
+                  onChange={(newDate) => {
+                     setFiscalYear((newDate.$y).toString());
+                  }}
+
+                  InputLabelProps={{
+                     style: { color: colors.grey[100] },
+                  }}
+                  
+                  renderInput={(params) => <TextField {...params} helperText={null} />}
+               />
+            </LocalizationProvider>
+
+         </Box>
 
          <Box
             m="10px 0 0 0"

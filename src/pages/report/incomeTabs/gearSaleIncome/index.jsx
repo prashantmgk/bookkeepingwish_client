@@ -1,4 +1,4 @@
-import { Box} from "@mui/material";
+import { Box, TextField} from "@mui/material";
 import { DataGrid,  GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
@@ -6,6 +6,11 @@ import {useQuery} from "@apollo/client";
 import {GET_GEAR_SALES} from "../../../../queries/incomeQueries";
 import LoadingScreen from "../../../../components/Backdrop";
 import Header from "../../../../components/Header";
+
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useState } from "react";
 
 function CustomToolbar() {
 
@@ -25,8 +30,15 @@ function CustomToolbar() {
 }
 
 const GearSalesIncomeReport = () => {
+   const defaultFiscalYear = new Date().getFullYear().toString();
+   const [fiscalYear, setFiscalYear] = useState(defaultFiscalYear);
 
-   const {loading, data} = useQuery(GET_GEAR_SALES);
+   const {loading, data} = useQuery(GET_GEAR_SALES, {
+      variables: {
+         fiscalYear: fiscalYear,
+      }
+
+   }, [fiscalYear]);
 
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
@@ -87,6 +99,35 @@ const GearSalesIncomeReport = () => {
             columnGap="10px"
             gridTemplateColumns="repeat(12, minmax(0, 1fr))"
          >  
+             <Box
+               sx={{
+                  gridColumn: {xs:"span 3" , lg: "span 2"},
+                  display: "flex"
+               }}
+            >
+               <LocalizationProvider dateAdapter={AdapterDayjs}
+                  sx={{
+                     width: "100%",
+                  }}
+               >
+                  <DatePicker
+                     views={['year']}
+                     label="Fiscal Year"
+                     value={fiscalYear}
+                     onChange={(newDate) => {
+                        setFiscalYear((newDate.$y).toString());
+                     }}
+
+                     InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                     }}
+                     
+                     renderInput={(params) => <TextField {...params} helperText={null} />}
+                  />
+               </LocalizationProvider>
+
+            </Box>
+
             <Box
                m="10px 0 0 0"
                gridColumn="span 12"

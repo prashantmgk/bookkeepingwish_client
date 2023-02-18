@@ -44,7 +44,7 @@ const Layout = ({window, children}) => {
             ml="15px"
             p="20px"
          >
-            <Typography variant="h3" color={colors.grey[100]}>
+            <Typography variant="h4" color={colors.grey[100]}>
                ADMINS
             </Typography>
          </Box>
