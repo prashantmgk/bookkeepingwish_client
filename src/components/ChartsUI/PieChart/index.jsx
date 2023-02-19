@@ -23,13 +23,11 @@ const ChartUIPie = ({fiscalYear}) => {
       variables: {
          fiscalYear: fiscalYear
       }
-
    });
 
 
    if (loading) return <Loading />;
    const newData = expenseData.getTotalExpenseBasedOnCategory
-
 
    const data = newData.map((item) => {
       return {
@@ -37,10 +35,8 @@ const ChartUIPie = ({fiscalYear}) => {
          total: item.total
       }
    })
-   
  
    const COLORS = ["#A2DED0", "#A2B6DF", "#D6A2DF", "#E6A2B6", "#DED6A2", "#EAEAEA", "#F4D03F", "#F1948A", "#7DCEA0", "#7FB3D5", "#5499C7", "#BB8FCE", "#D98880", "#AEB6BF", "#F5B7B1", "#D7BDE2", "#F9E79F", "#F8C471", "#85C1E9", "#73C6B6"];
-   
    return (
       <ResponsiveContainer width="100%" height="100%" className="text-center" >
          <PieChart>
