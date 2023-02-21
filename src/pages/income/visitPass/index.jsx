@@ -10,6 +10,8 @@ import { ADD_VISIT_PASS } from "../../../mutations/visitPassMutation";
 
 import {Formik, Form} from "formik";
 import * as Yup from "yup";
+import { useState } from "react";
+import { GET_VISIT_PASSES } from "../../../queries/incomeQueries";
 
 
 function addDays(date, days) {
@@ -39,6 +41,7 @@ const VisitPass = () => {
 
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+   const [values, setValues] = useState("");
 
    const handleFormSubmit = (value, {resetForm}) => {
 
@@ -60,9 +63,21 @@ const VisitPass = () => {
 
    };
 
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
+
    // ADDING BILL TO SERVER DATABASE 
    const [addVisitPass, {loading}] = useMutation(ADD_VISIT_PASS, {
-      // update: updateCache
+      refetchQueries: [{query: GET_VISIT_PASSES, variables: {fiscalYear: getFiscalYear(values.date)}}]
    });
 
    if (loading) return <LoadingScreen/>
@@ -88,6 +103,9 @@ const VisitPass = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {
+                     setValues(values)
+                  }
                   <Box
                      display="grid"
                      rowGap="16px"

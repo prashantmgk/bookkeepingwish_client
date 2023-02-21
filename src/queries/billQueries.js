@@ -17,19 +17,19 @@ const GET_BILLS_BY_CATEGORY = gql`
 
 const GET_BILLS_BY_TYPE = gql`
 query Query($billsType: String!, $fiscalYear: String!) {
-  getBillsByType(billsType: $billsType, fiscalYear: $fiscalYear) {
-    vendor
-    remarks
-    total
-    rate
-    quantity
-    particular
-    panNumber
-    id
-    date
-    category
-    billsType
-  }
+   getBillsByType(billsType: $billsType, fiscalYear: $fiscalYear) {
+      vendor
+      remarks
+      total
+      rate
+      quantity
+      particular
+      panNumber
+      id
+      date
+      category
+      billsType
+   }
 }
 `
 

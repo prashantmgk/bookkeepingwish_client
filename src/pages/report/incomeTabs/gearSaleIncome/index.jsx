@@ -1,8 +1,8 @@
-import { Box, TextField} from "@mui/material";
+import { Box, IconButton, TextField} from "@mui/material";
 import { DataGrid,  GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {GET_GEAR_SALES} from "../../../../queries/incomeQueries";
 import LoadingScreen from "../../../../components/Backdrop";
 import Header from "../../../../components/Header";
@@ -11,6 +11,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
+import { Delete } from "@mui/icons-material";
+import { DELETE_GEAR_SALES_ENTRY } from "../../../../mutations/gearSalesMutation";
 
 function CustomToolbar() {
 
@@ -81,6 +83,17 @@ const GearSalesIncomeReport = () => {
          align: "center",
          headerAlign: "center",
       },
+
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} fiscalYear={fiscalYear} />
+      }    
    ];
 
    
@@ -185,5 +198,25 @@ const GearSalesIncomeReport = () => {
       </Box>
    )
 }
+
+const DeleteAction = (props) => {
+   const { id,  fiscalYear } = props;
+
+   const [deleteGearSales] = useMutation(DELETE_GEAR_SALES_ENTRY, {
+      refetchQueries: [{query: GET_GEAR_SALES, variables: { fiscalYear: fiscalYear }}],
+      variables: { gearSalesId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deleteGearSales();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
+
 
 export default GearSalesIncomeReport;

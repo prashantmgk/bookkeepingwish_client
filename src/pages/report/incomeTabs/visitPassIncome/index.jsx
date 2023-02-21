@@ -1,16 +1,18 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, IconButton, TextField, Typography } from "@mui/material";
 import Header from "../../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import LoadingScreen from "../../../../components/Backdrop";
 import {GET_VISIT_PASSES} from "../../../../queries/incomeQueries";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
+import { DELETE_VISIT_PASS } from "../../../../mutations/visitPassMutation";
+import { Delete } from "@mui/icons-material";
 
 function CustomToolbar() {
    return (
@@ -83,7 +85,17 @@ const VisitPassReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
-      }
+      },
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id}  fiscalYear={fiscalYear} />
+      } 
    ]
 
    if(loading) return <LoadingScreen />
@@ -190,5 +202,24 @@ const VisitPassReport = () => {
       </Box>
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, fiscalYear } = props;
+
+   const [deleteVisitPass] = useMutation(DELETE_VISIT_PASS, {
+      refetchQueries: [ { query: GET_VISIT_PASSES, variables: { fiscalYear: fiscalYear } } ],
+      variables: { visitPassId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deleteVisitPass();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
 
 export default VisitPassReport;

@@ -16,4 +16,13 @@ const ADD_CUSTOMER_ENTRY = gql`
       }
    }
 `
-export {ADD_CUSTOMER_ENTRY};
+const DELETE_CUSTOMER_ENTRY = gql`
+mutation Mutation($customerEntryId: ID!) {
+   deleteCustomerEntry(customerEntryId: $customerEntryId) {
+      id
+   }
+}
+   
+`
+
+export {ADD_CUSTOMER_ENTRY, DELETE_CUSTOMER_ENTRY};

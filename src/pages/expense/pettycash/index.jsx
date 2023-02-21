@@ -11,6 +11,8 @@ import * as Yup from "yup";
 
 import {useMutation} from "@apollo/client"
 import { ADD_BILL } from "../../../mutations/billMutation";
+import { useState } from "react";
+import { GET_BILLS_BY_CATEGORY, GET_BILLS_BY_TYPE } from "../../../queries/billQueries";
 
 const numberRegExp = /^[0-9]*(\.[0-9]{0,2})?$/;
 
@@ -41,6 +43,7 @@ const PettyCash = () => {
 
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+   const [values, setValues] = useState("");
 
    const handleFormSubmit = (value, {resetForm}) => {
 
@@ -64,8 +67,24 @@ const PettyCash = () => {
       resetForm({values: INITIAL_FORM_STATE});
    };
 
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
+
    // ADDING BILL TO SERVER DATABASE 
    const [addBill, {loading}] = useMutation(ADD_BILL, {
+      refetchQueries: [
+         {query: GET_BILLS_BY_CATEGORY, variables: {category: values.category, fiscalYear: getFiscalYear(values.date)}},
+         {query: GET_BILLS_BY_TYPE, variables: {billsType: values.billsType, fiscalYear: getFiscalYear(values.date)}}
+      ],
    });
 
    if (loading) return <LoadingScreen/>
@@ -91,6 +110,7 @@ const PettyCash = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {setValues(values)}
                   <Box
                      display="grid"
                      rowGap="16px"

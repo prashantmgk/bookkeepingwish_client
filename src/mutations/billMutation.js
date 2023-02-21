@@ -17,5 +17,13 @@ const ADD_BILL = gql`
    }
 `;
 
+const DELETE_BILL = gql`
+   mutation Mutation($billId: ID!) {
+      deleteBill(billId: $billId) {
+         id
+      }
+   }
+`;
 
-export {ADD_BILL};
+
+export {ADD_BILL, DELETE_BILL};

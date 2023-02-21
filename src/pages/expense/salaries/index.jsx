@@ -11,6 +11,8 @@ import * as Yup from "yup";
 
 import {useMutation} from "@apollo/client"
 import { ADD_SALARY } from "../../../mutations/salaryMutation";
+import { useState } from "react";
+import { GET_SALARY_BY_EMPLOYEE_NAME } from "../../../queries/salaryQueries";
 
 const currentDate = new Date();
 const defaultDate = currentDate.toISOString().split('T')[0];
@@ -46,6 +48,8 @@ const Salary = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
 
+   const [values, setValues] = useState("");
+
    const handleFormSubmit = (value, {resetForm}) => {
 
       alert(JSON.stringify(value, null, 2));
@@ -67,8 +71,20 @@ const Salary = () => {
       resetForm({values: INITIAL_FORM_STATE});
    };
 
-   const [addSalary, {loading}] = useMutation(ADD_SALARY, {
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+    }
 
+   const [addSalary, {loading}] = useMutation(ADD_SALARY, {
+      refetchQueries: [ {query: GET_SALARY_BY_EMPLOYEE_NAME, variables: {employeeName: values.employeeName, fiscalYear: getFiscalYear(values.date)}}]
    });
 
 
@@ -96,6 +112,7 @@ const Salary = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {setValues(values)}
                   <Box
                      display="grid"
                      rowGap="16px"

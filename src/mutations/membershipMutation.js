@@ -13,4 +13,13 @@ const ADD_MEMBERSHIP = gql`
       }
    }
 `
-export {ADD_MEMBERSHIP};
+
+const DELETE_MEMBERSHIP = gql`
+mutation Mutation($membershipId: ID!) {
+  deleteMembership(membershipId: $membershipId) {
+    id
+  }
+}
+`
+
+export {ADD_MEMBERSHIP, DELETE_MEMBERSHIP};

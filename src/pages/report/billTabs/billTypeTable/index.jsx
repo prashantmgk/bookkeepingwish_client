@@ -1,11 +1,14 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, FormControl, IconButton, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { DataGrid,  GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {GET_BILLS_BY_TYPE} from "../../../../queries/billQueries";
+import { DELETE_BILL } from "../../../../mutations/billMutation";
 import LoadingScreen from "../../../../components/Backdrop";
+
+import { Delete } from '@mui/icons-material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -117,6 +120,16 @@ const BillTypeReport = () => {
          headerAlign: "center",
       },
       
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} billType={billType} fiscalYear={fiscalYear} />
+      }    
    ];
 
    if (loading) return <LoadingScreen/>;
@@ -253,5 +266,25 @@ const BillTypeReport = () => {
    </Box>   
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, billType, fiscalYear } = props;
+
+   const [deleteBill] = useMutation(DELETE_BILL, {
+      refetchQueries : [{ query: GET_BILLS_BY_TYPE, variables: { billsType: billType, fiscalYear } }],
+      variables: { billId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deleteBill();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
+
 
 export default BillTypeReport;

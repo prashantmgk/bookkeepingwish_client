@@ -1,16 +1,18 @@
-import { Box, TextField } from "@mui/material";
+import { Box, IconButton, TextField } from "@mui/material";
 import Header from "../../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import LoadingScreen from "../../../../components/Backdrop";
 import {GET_MEMBERSHIPS} from "../../../../queries/incomeQueries";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
+import { DELETE_MEMBERSHIP } from "../../../../mutations/membershipMutation";
+import { Delete } from "@mui/icons-material";
 
 function CustomToolbar() {
    return (
@@ -77,6 +79,17 @@ const MembershipReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+      },
+      
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} fiscalYear={fiscalYear} />
       }
    ]
 
@@ -183,5 +196,25 @@ const MembershipReport = () => {
       </Box>
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, fiscalYear } = props;
+
+   const [deleteMembership] = useMutation(DELETE_MEMBERSHIP, {
+      refetchQueries: [ { query: GET_MEMBERSHIPS, variables: { fiscalYear: fiscalYear } } ],
+      variables: { membershipId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deleteMembership();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
+
 
 export default MembershipReport;

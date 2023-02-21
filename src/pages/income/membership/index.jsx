@@ -11,6 +11,8 @@ import * as Yup from "yup";
 
 import { useMutation } from "@apollo/client";
 import { ADD_MEMBERSHIP } from "../../../mutations/membershipMutation";
+import { useState } from "react";
+import { GET_MEMBERSHIPS } from "../../../queries/incomeQueries";
 
 function addDays(date, days) {
    const dt = new Date(date);
@@ -38,6 +40,7 @@ const Membership = () => {
 
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+   const [values, setValues] = useState("")
 
    const handleFormSubmit = (value, {resetForm}) => {
 
@@ -59,7 +62,21 @@ const Membership = () => {
       resetForm({values: INITIAL_FORM_STATE})
    };
 
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
+
+
    const [addMembership, {loading}] = useMutation(ADD_MEMBERSHIP, {
+      refetchQueries: [{query: GET_MEMBERSHIPS, variables: {fiscalYear: getFiscalYear(values.date)}}]
 
    });
 
@@ -86,6 +103,7 @@ const Membership = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {setValues(values)}
                   <Box
                      display="grid"
                      rowGap="16px"

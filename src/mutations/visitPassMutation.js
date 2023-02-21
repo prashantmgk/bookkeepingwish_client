@@ -13,4 +13,12 @@ const ADD_VISIT_PASS = gql`
    }
 `
 
-export { ADD_VISIT_PASS };
+const DELETE_VISIT_PASS = gql`
+mutation Mutation($visitPassId: ID!) {
+  deleteVisitPass(visitPassId: $visitPassId) {
+    id
+  }
+}
+`
+
+export { ADD_VISIT_PASS, DELETE_VISIT_PASS };

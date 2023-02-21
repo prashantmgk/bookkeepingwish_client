@@ -1,15 +1,17 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, FormControl, IconButton, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {GET_BILLS_BY_CATEGORY} from "../../../../queries/billQueries";
 import LoadingScreen from "../../../../components/Backdrop";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Delete } from "@mui/icons-material";
+import { DELETE_BILL } from "../../../../mutations/billMutation";
 
 function CustomToolbar() {
 
@@ -104,6 +106,16 @@ const BillCategoryReport = () => {
          headerAlign: "center",
       },
       
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} category={category} fiscalYear={fiscalYear}/>
+      }   
    ];
 
 
@@ -250,5 +262,25 @@ const BillCategoryReport = () => {
    </Box>   
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, category, fiscalYear } = props;
+
+   const [deleteBill] = useMutation(DELETE_BILL, {
+      
+      refetchQueries: [{ query: GET_BILLS_BY_CATEGORY, variables: { category, fiscalYear} }],
+      variables: { billId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deleteBill();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
 
 export default BillCategoryReport;

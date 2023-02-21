@@ -20,7 +20,14 @@ const ADD_SALARY = gql`
    }
 `;
 
+const DELETE_SALARY = gql`
+mutation Mutation($salaryId: ID!) {
+   deleteSalary(salaryId: $salaryId) {
+      id
+  }
+}
+`;
 
-export {ADD_SALARY};
+export {ADD_SALARY, DELETE_SALARY};
 
 

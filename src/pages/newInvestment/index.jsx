@@ -30,17 +30,8 @@ const NewInvestment = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
 
-   const updateCache = (cache, { data: { addNewInvestor } }) => {
-      const data = cache.readQuery({ query: GET_INVESTORS });
-      data.investors.push(addNewInvestor);
-      cache.writeQuery({
-        query: GET_INVESTORS,
-        data
-      });
-   };
-
    const [addNewInvestor, {loading}] = useMutation(ADD_NEW_INVESTOR, {
-      update: updateCache
+      refetchQueries: [{query: GET_INVESTORS}]
    });
 
    const handleFormSubmit = (value, {resetForm}) => {

@@ -11,6 +11,8 @@ import * as Yup from "yup";
 
 import { useMutation } from "@apollo/client";
 import { ADD_GEAR_SALES_ENTRY } from "../../../mutations/gearSalesMutation";
+import { useState } from "react";
+import { GET_GEAR_SALES } from "../../../queries/incomeQueries";
 
 const numberRegExp = /^[0-9]*(\.[0-9]{0,2})?$/;
 
@@ -42,6 +44,8 @@ const GearSales = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
 
+   const [values, setValues] = useState("");
+
    const handleFormSubmit = (value, {resetForm}) => {
 
       value.amount = value.quantity * value.rate;
@@ -61,9 +65,20 @@ const GearSales = () => {
       resetForm({values: INITIAL_FORM_STATE})
    };
 
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
 
    const [addGearSales, {loading}] = useMutation(ADD_GEAR_SALES_ENTRY, {
-
+      refetchQueries: [{query: GET_GEAR_SALES, variables: {fiscalYear: getFiscalYear(values.date)}}], 
    });
 
 
@@ -90,6 +105,9 @@ const GearSales = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {
+                     setValues(values)
+                  }
                   <Box
                      display="grid"
                      rowGap="16px"

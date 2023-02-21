@@ -1,10 +1,10 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, IconButton, TextField } from "@mui/material";
 import Header from "../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
-import {useLazyQuery} from "@apollo/client";
+import {useLazyQuery, useMutation} from "@apollo/client";
 import {GET_SALARY_BY_EMPLOYEE_NAME} from "../../../queries/salaryQueries";
 import LoadingScreen from "../../../components/Backdrop";
 
@@ -12,6 +12,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { DELETE_SALARY } from "../../../mutations/salaryMutation";
+import { Delete } from "@mui/icons-material";
 
 function CustomToolbar() {
 
@@ -57,7 +59,6 @@ const SalaryReport = () => {
          align: "center",
          headerAlign: "center",
       },
-
       {
          field: "position",
          headerName: "Position",
@@ -82,6 +83,17 @@ const SalaryReport = () => {
          align: "center",
          headerAlign: "center",
       },
+
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} employeeName={name} fiscalYear={(fiscalYear.$y).toString()} />
+      }
    ];
 
    if(loading) return <LoadingScreen />
@@ -218,5 +230,24 @@ const SalaryReport = () => {
    </Box>   
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, employeeName, fiscalYear } = props;
+   const [deleteSalary] = useMutation(DELETE_SALARY, {
+      variables: {salaryId: id },
+      refetchQueries: [{ query: GET_SALARY_BY_EMPLOYEE_NAME, variables: {employeeName, fiscalYear} }],
+   });
+
+   const handleDelete = () => {
+      deleteSalary();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+}
+
 
 export default SalaryReport;

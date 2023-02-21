@@ -13,5 +13,13 @@ const ADD_GEAR_SALES_ENTRY = gql`
    }
 `
 
-export { ADD_GEAR_SALES_ENTRY };
+const DELETE_GEAR_SALES_ENTRY = gql`
+mutation Mutation($gearSalesId: ID!) {
+  deleteGearSales(gearSalesId: $gearSalesId) {
+    id
+  }
+}
+`
+
+export { ADD_GEAR_SALES_ENTRY, DELETE_GEAR_SALES_ENTRY};
 

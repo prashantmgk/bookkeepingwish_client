@@ -11,7 +11,9 @@ import * as Yup from "yup";
 
 import { useMutation} from "@apollo/client"
 import { ADD_BILL } from "../../../mutations/billMutation";
-import {GET_CUSTOMER_ENTRIES} from "../../../queries/incomeQueries";
+
+import { GET_BILLS_BY_CATEGORY, GET_BILLS_BY_TYPE } from "../../../queries/billQueries";
+import { useState } from "react";
 
 const numberRegExp = /^[0-9]*(\.[0-9]{0,2})?$/;
 const panNUmberRegExp = /^[0-9]{9}$/;
@@ -50,6 +52,7 @@ const VatBill = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
 
+   const [values, setValues] = useState("");
    const handleFormSubmit = (value, {resetForm}) => {
 
       value.amount = value.quantity * value.rate;
@@ -72,10 +75,26 @@ const VatBill = () => {
       resetForm({values: INITIAL_FORM_STATE});
    };
 
+   // hamlay pass gareko fiscal year hainw year matrai ho.. so hamru lay date analysise garerw fiscal year acutally kun ho determine garerw balla pass garnu parxw
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
+   
    // ADDING BILL TO SERVER DATABASE 
-   const [addBill, {loading, data}] = useMutation(ADD_BILL, {
+   const [addBill, {loading}] = useMutation(ADD_BILL, {
+      refetchQueries: [
+         {query: GET_BILLS_BY_CATEGORY, variables: {category: values.category, fiscalYear: getFiscalYear(values.date)}},
+         {query: GET_BILLS_BY_TYPE, variables: {billsType: values.billsType, fiscalYear: getFiscalYear(values.date)}}
+      ],
    });
-
 
    if (loading) return <LoadingScreen/>
 
@@ -101,6 +120,9 @@ const VatBill = () => {
                   handleSubmit,
             }) => (
          <Form onSubmit={handleSubmit}>
+            {
+               setValues(values)
+            }
          <Box
             display="grid"
             rowGap="16px"

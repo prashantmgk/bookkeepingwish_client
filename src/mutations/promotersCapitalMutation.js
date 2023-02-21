@@ -12,6 +12,15 @@ mutation Mutation($promotersCapitalInput: PromotersCapitalInput) {
     capitalPercentage
   }
 }
+`
+
+const DELETE_PROMOTERS_CAPITAL = gql`
+mutation DeletePromotersCapital($promotersCapitalId: ID!) {
+  deletePromotersCapital(promotersCapitalId: $promotersCapitalId) {
+    id
+  }
+}
 
 `
-export {ADD_PROMOTERS_CAPITAL};
+
+export {ADD_PROMOTERS_CAPITAL, DELETE_PROMOTERS_CAPITAL};

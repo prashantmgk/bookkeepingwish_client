@@ -1,12 +1,14 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, FormControl, IconButton, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 import Header from "../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
-import {useLazyQuery, useQuery} from "@apollo/client";
+import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
 import {GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME} from "../../../queries/investorQueries";
 import LoadingScreen from "../../../components/Backdrop";
+import { Delete } from "@mui/icons-material";
+import { DELETE_PROMOTERS_CAPITAL } from "../../../mutations/promotersCapitalMutation";
 
 function CustomToolbar() {
    return (
@@ -95,7 +97,16 @@ const PromotersCapitalReport = () => {
             </Typography>
           ),
       },
-
+      {
+         field: "action",
+         headerName: "",
+         disableExport: true,
+         width: 80,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} name={investor} />
+      }    
    ]
 
    const handleChange = (event) => {
@@ -207,5 +218,24 @@ const PromotersCapitalReport = () => {
       </Box>
    )
 }
+
+const DeleteAction = (props) => {
+   const { id, name } = props;
+
+   const [deletePromotersCapital] = useMutation(DELETE_PROMOTERS_CAPITAL, {
+      refetchQueries: [ { query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: { name } } ],
+      variables: { promotersCapitalId: id.toString() },
+   });
+
+   const handleDelete = () => {
+      deletePromotersCapital();
+   }; 
+
+   return (
+      <IconButton onClick={handleDelete}>
+         <Delete />
+      </IconButton>
+   );
+};
 
 export default PromotersCapitalReport;

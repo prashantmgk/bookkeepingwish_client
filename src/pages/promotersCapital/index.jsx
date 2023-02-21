@@ -6,7 +6,7 @@ import Button from "../../components/FormsUI/Button";
 
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import  {ADD_PROMOTERS_CAPITAL}  from "../../mutations/promotersCapitalMutation";
-import { GET_INVESTORS, GET_PROMOTERS_CAPITAL_TILL_NOW, GET_INVESTOR_BY_NAME } from "../../queries/investorQueries";
+import { GET_INVESTORS, GET_PROMOTERS_CAPITAL_TILL_NOW, GET_INVESTOR_BY_NAME, GET_PROMOTERS_CAPITAL_BY_NAME } from "../../queries/investorQueries";
 import LoadingScreen from "../../components/Backdrop";
 
 import {Formik, Form} from "formik";
@@ -45,7 +45,7 @@ const PromotersCapital = () => {
    const {loading: investorDataLoading, data: investorData} = useQuery(GET_INVESTORS);
    const skipI = investorData?.newInvestors;
 
-   const [promotersCapitalTillNowCall, {loading: promotersCapitalTillNowLoading, data:promotersCapitalTillNowData}] = useLazyQuery(GET_PROMOTERS_CAPITAL_TILL_NOW, {
+   const [promotersCapitalTillNowCall, { data:promotersCapitalTillNowData}] = useLazyQuery(GET_PROMOTERS_CAPITAL_TILL_NOW, {
       variables: {name: investorName},
       onCompleted: (data) => {
          setPromotersCapitalTillNow(data.getPromotersPaidCapitalTillNowByName);
@@ -53,7 +53,7 @@ const PromotersCapital = () => {
       skip: !skipI,
    },[investorName]);
 
-   const [totalCapitalOfInvestorCall, {loading: totalCapitalOfInvestorLoading, data:totalCapitalOfInvestorData}] = useLazyQuery(GET_INVESTOR_BY_NAME, {
+   const [totalCapitalOfInvestorCall, { data:totalCapitalOfInvestorData}] = useLazyQuery(GET_INVESTOR_BY_NAME, {
       variables: {name: investorName},
       onCompleted: (data) => {
          setTotalCapital(data.getNewInvestorByName.totalCapital);
@@ -65,6 +65,7 @@ const PromotersCapital = () => {
 
    const [addPromotersCapital, {loading}] = useMutation(ADD_PROMOTERS_CAPITAL, {
       skip: !skipJ,
+      refetchQueries: [ {query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: {name: investorName}} ],
    });
 
    const handleInvestorNameChange = (event) => {

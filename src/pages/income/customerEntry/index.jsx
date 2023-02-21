@@ -7,10 +7,11 @@ import Button from "../../../components/FormsUI/Button";
 import LoadingScreen from "../../../components/Backdrop";
 import { useMutation } from "@apollo/client";
 import { ADD_CUSTOMER_ENTRY } from "../../../mutations/customerEntry";
-import { GET_INVESTORS } from "../../../queries/investorQueries";
 
 import {Formik, Form} from "formik";
 import * as Yup from "yup";
+import { GET_CUSTOMER_ENTRIES } from "../../../queries/incomeQueries";
+import { useState } from "react";
 
 const numberRegExp = /^[0-9]*(\.[0-9]{0,2})?$/;
 
@@ -44,6 +45,7 @@ const FORM_VALIDATION = Yup.object().shape({
 const CustomerEntry = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+   const [values, setValues] = useState("");
 
    const handleFormSubmit = (value, {resetForm}) => {
 
@@ -67,17 +69,21 @@ const CustomerEntry = () => {
       resetForm({values: INITIAL_FORM_STATE})
    };
 
-   const updateCache = (cache, { data: { addCustomerEntry } }) => {
-      const data = cache.readQuery({ query: GET_INVESTORS });
-      data.investors.push(addCustomerEntry);
-      cache.writeQuery({
-        query: GET_INVESTORS,
-        data
-      });
-   };
+
+   function getFiscalYear(dateString) {
+      const date = new Date(dateString);
+      const currentYear = new Date().getFullYear();
+      const fiscalYearStart = new Date(`${currentYear}-07-16`);
+      
+      if (date > fiscalYearStart) {
+        return currentYear.toString();
+      } else {
+        return (currentYear - 1).toString();
+      }
+   }
 
    const [addCustomerEntry, {loading}] = useMutation(ADD_CUSTOMER_ENTRY, {
-      update: updateCache,
+      refetchQueries: [{query: GET_CUSTOMER_ENTRIES, variables: {fiscalYear: getFiscalYear(values.date)}}],
    });
 
    if (loading) return <LoadingScreen/>
@@ -104,6 +110,7 @@ const CustomerEntry = () => {
             handleSubmit,
             }) => (
                <Form onSubmit={handleSubmit}>
+                  {setValues(values)}
                   <Box
                      display="grid"
                      rowGap="16px"
