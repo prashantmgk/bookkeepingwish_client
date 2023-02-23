@@ -13,6 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import { DELETE_VISIT_PASS } from "../../../../mutations/visitPassMutation";
 import { Delete } from "@mui/icons-material";
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
    return (
@@ -211,14 +212,27 @@ const DeleteAction = (props) => {
       variables: { visitPassId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteVisitPass();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deleteVisitPass}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

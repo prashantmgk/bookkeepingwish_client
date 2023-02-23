@@ -13,6 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import { Delete } from "@mui/icons-material";
 import { DELETE_GEAR_SALES_ENTRY } from "../../../../mutations/gearSalesMutation";
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
 
@@ -207,14 +208,27 @@ const DeleteAction = (props) => {
       variables: { gearSalesId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteGearSales();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord={deleteGearSales}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

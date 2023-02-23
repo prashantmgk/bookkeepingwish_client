@@ -6,6 +6,7 @@ import { useState } from "react";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_BILLS_BY_CATEGORY} from "../../../../queries/billQueries";
 import LoadingScreen from "../../../../components/Backdrop";
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -272,14 +273,27 @@ const DeleteAction = (props) => {
       variables: { billId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteBill();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deleteBill}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

@@ -13,6 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import { DELETE_CUSTOMER_ENTRY } from "../../../../mutations/customerEntry";
 import { Delete } from "@mui/icons-material";
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
    return (
@@ -225,14 +226,27 @@ const DeleteAction = (props) => {
       variables: { customerEntryId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteCustomerEntry();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deleteCustomerEntry}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

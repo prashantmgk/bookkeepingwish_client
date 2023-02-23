@@ -9,6 +9,7 @@ import {GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME} from "../../../queries/inv
 import LoadingScreen from "../../../components/Backdrop";
 import { Delete } from "@mui/icons-material";
 import { DELETE_PROMOTERS_CAPITAL } from "../../../mutations/promotersCapitalMutation";
+import AlertDialogSlide from "../../../components/Alertbox";
 
 function CustomToolbar() {
    return (
@@ -227,14 +228,27 @@ const DeleteAction = (props) => {
       variables: { promotersCapitalId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deletePromotersCapital();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deletePromotersCapital}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

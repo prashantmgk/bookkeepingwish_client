@@ -14,6 +14,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { DELETE_SALARY } from "../../../mutations/salaryMutation";
 import { Delete } from "@mui/icons-material";
+import AlertDialogSlide from "../../../components/Alertbox";
 
 function CustomToolbar() {
 
@@ -237,15 +238,27 @@ const DeleteAction = (props) => {
       variables: {salaryId: id },
       refetchQueries: [{ query: GET_SALARY_BY_EMPLOYEE_NAME, variables: {employeeName, fiscalYear} }],
    });
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
 
    const handleDelete = () => {
-      deleteSalary();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deleteSalary}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 }
 

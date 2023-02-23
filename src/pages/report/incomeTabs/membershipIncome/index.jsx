@@ -13,6 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import { DELETE_MEMBERSHIP } from "../../../../mutations/membershipMutation";
 import { Delete } from "@mui/icons-material";
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
    return (
@@ -205,14 +206,27 @@ const DeleteAction = (props) => {
       variables: { membershipId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteMembership();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord ={deleteMembership}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 

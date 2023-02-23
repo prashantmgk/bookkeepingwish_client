@@ -7,7 +7,7 @@ import {useMutation, useQuery} from "@apollo/client";
 import {GET_BILLS_BY_TYPE} from "../../../../queries/billQueries";
 import { DELETE_BILL } from "../../../../mutations/billMutation";
 import LoadingScreen from "../../../../components/Backdrop";
-
+import AlertDialogSlide from "../../../../components/Alertbox";
 import { Delete } from '@mui/icons-material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -212,7 +212,6 @@ const BillTypeReport = () => {
             </LocalizationProvider>
 
          </Box>
-         
 
          <Box
             m="10px 0 0 0"
@@ -275,14 +274,27 @@ const DeleteAction = (props) => {
       variables: { billId: id.toString() },
    });
 
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
    const handleDelete = () => {
-      deleteBill();
+      setOpen(true);
    }; 
 
    return (
-      <IconButton onClick={handleDelete}>
-         <Delete />
-      </IconButton>
+      <>
+         <IconButton onClick={handleDelete}>
+            <Delete />
+         </IconButton>
+         <AlertDialogSlide 
+            deleteRecord={deleteBill}
+            open={open}
+            handleClose={handleClose}
+         />
+      </>
    );
 };
 
