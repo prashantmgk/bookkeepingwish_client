@@ -31,7 +31,7 @@ const INITIAL_FORM_STATE = {
 const FORM_VALIDATION = Yup.object().shape({
    item: Yup.string().required("Required"),
    rate: Yup.number().test("check-decimal", "Invalid number, only upto two decimal points", value => numberRegExp.test(value)),
-   quantity: Yup.number().positive("Must be more than 0").integer("Cannot be a decimal").required("Required"),
+   quantity: Yup.number("Must be a number"),
    amount: Yup.number("Must be a number"),
    remarks: Yup.string().required("Required"),
    date: Yup.string().required("Required"),
@@ -198,7 +198,7 @@ const GearSales = () => {
                         variant="standard"
                         type="number"
                         label="Amount"
-                        value={values.rate * values.quantity}
+                        value={(values.rate * values.quantity).toFixed(2)}
                         disabled
                         InputLabelProps={{
                            style: { color: colors.grey[100] },

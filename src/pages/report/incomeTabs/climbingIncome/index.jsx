@@ -11,8 +11,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
-import { DELETE_CUSTOMER_ENTRY } from "../../../../mutations/customerEntry";
+import { DELETE_CUSTOMER_ENTRY, UPDATE_CUSTOMER_ENTRY } from "../../../../mutations/customerEntry";
 import { Delete } from "@mui/icons-material";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
@@ -53,60 +54,93 @@ const ClimbingIncomeReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "name",
          headerName: "Name",
          flex: 3,
+         editable: true,
       },
       {
          field: "wallCharge",
          headerName: "Wall Charge",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "shoesRent",
          headerName: "Shoes Rent",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
+      },
+      {
+         field: "rope",
+         headerName: "Ropes",
+         type: "number",
+         flex: 2,
+         align: "center",
+         headerAlign: "center",
+         editable: true,
       },
       {
          field: "belay",
          headerName: "Belay",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "harnessRent",
          headerName: "Harness Rent",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "chalk",
          headerName: "Chalk",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "total",
          headerName: "Total",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
       },
 
       {
-         field: "action",
-         headerName: "",
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} fiscalYear={fiscalYear}/>
+      },
+
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -242,13 +276,61 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deleteCustomerEntry}
+            action={deleteCustomerEntry}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
          />
       </>
    );
 };
 
+
+const EditAction = (props) => {
+
+   const { params, fiscalYear } = props;
+   const { id } = params.row;
+   const customerEntryInput = {
+      name: params.row.name,
+      wallCharge: params.row.wallCharge || 0,
+      belay: params.row.belay || 0,
+      shoesRent: params.row.shoesRent || 0,
+      harnessRent: params.row.harnessRent || 0,
+      chalk: params.row.chalk  || 0,
+      rope: params.row.rope || 0,
+      remarks: params.row.remarks,
+      date: params.row.date,
+      total: (params.row.wallCharge + params.row.belay + params.row.shoesRent + params.row.harnessRent + params.row.chalk + params.row.rope),
+   }
+
+   const [updateCustomerEntry] = useMutation(UPDATE_CUSTOMER_ENTRY, {
+      refetchQueries : [{ query: GET_CUSTOMER_ENTRIES, variables: { fiscalYear } }],
+      variables: { customerEntryId: id.toString(), customerEntryInput: customerEntryInput },
+   });
+    
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateCustomerEntry}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
+         />
+      </>
+   );
+};
 
 export default ClimbingIncomeReport;

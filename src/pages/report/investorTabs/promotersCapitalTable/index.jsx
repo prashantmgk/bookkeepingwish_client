@@ -1,15 +1,16 @@
 import { Box, FormControl, IconButton, InputLabel, MenuItem, Select, Typography } from "@mui/material";
-import Header from "../../../components/Header";
+import Header from "../../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
-import { tokens } from "../../../theme";
+import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
 import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
-import {GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME} from "../../../queries/investorQueries";
-import LoadingScreen from "../../../components/Backdrop";
+import {GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME, GET_PROMOTERS_CAPITAL_TILL_NOW} from "../../../../queries/investorQueries";
 import { Delete } from "@mui/icons-material";
-import { DELETE_PROMOTERS_CAPITAL } from "../../../mutations/promotersCapitalMutation";
-import AlertDialogSlide from "../../../components/Alertbox";
+import LoadingScreen from "../../../../components/Backdrop";
+import { DELETE_PROMOTERS_CAPITAL, UPDATE_PROMOTERS_CAPITAL } from "../../../../mutations/promotersCapitalMutation";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
    return (
@@ -48,10 +49,11 @@ const PromotersCapitalReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "name",
-         headerName: "Investors",
+         headerName: "Investor",
          flex: 4,
          align: "center",
          headerAlign: "center",
@@ -62,6 +64,7 @@ const PromotersCapitalReport = () => {
          flex: 4,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "accountOrBank",
@@ -69,6 +72,7 @@ const PromotersCapitalReport = () => {
          flex: 4,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "paidCapital",
@@ -76,6 +80,8 @@ const PromotersCapitalReport = () => {
          flex: 4,
          align: "center",
          headerAlign: "center",
+         type: "number",
+         editable: true,
       },
 
       {
@@ -84,6 +90,7 @@ const PromotersCapitalReport = () => {
          flex: 4,
          align: "center",
          headerAlign: "center",
+         type: "number",
       },
 
       {
@@ -98,11 +105,32 @@ const PromotersCapitalReport = () => {
             </Typography>
           ),
       },
+
       {
-         field: "action",
-         headerName: "",
+         field: "totalCapital",
+         headerName: "Capital Total",
+         flex: 4,
+         align: "center",
+         headerAlign: "center",
+         type: "number",
+      },
+
+      {
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} name={investor}/>
+      },
+      
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -244,9 +272,68 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deletePromotersCapital}
+            action ={deletePromotersCapital}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
+         />
+      </>
+   );
+};
+
+const EditAction = (props) => {
+
+   const { params, name } = props;
+   const { id } = params.row;
+   const [promotersCapitalTillNow, setPromotersCapitalTillNow] = useState(0);
+
+   const [promotersCapitalTillNowCall] = useLazyQuery(GET_PROMOTERS_CAPITAL_TILL_NOW, {
+      variables: {name: name},
+      onCompleted: (data) => {
+         setPromotersCapitalTillNow(data.getPromotersPaidCapitalTillNowByName);
+      },
+   },[name]);
+
+   const [updatePromotersCapital] = useMutation(UPDATE_PROMOTERS_CAPITAL, {
+      refetchQueries: [ { query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: { name } } ],
+   });
+   
+   const [open, setOpen] = useState(false);
+   
+   const handleClose = () => {
+      setOpen(false);
+   };
+   
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   const updateRecord = () => {
+      promotersCapitalTillNowCall();
+
+      const promotersCapitalInput = {
+         name: name,
+         paidCapital: params.row.paidCapital,
+         paymentMethod: params.row.paymentMethod,
+         accountOrBank: params.row.accountOrBank,
+         date: params.row.date,
+         remainingCapital: params.row.totalCapital - (promotersCapitalTillNow + params.row.paidCapital),
+         capitalPercentage : (((promotersCapitalTillNow + params.row.paidCapital) / params.row.totalCapital) * 100),
+         totalCapital: params.row.totalCapital
+      }
+      updatePromotersCapital({variables: { promotersCapitalId: id.toString(), promotersCapitalInput: promotersCapitalInput }});
+   }
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateRecord}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
          />
       </>
    );

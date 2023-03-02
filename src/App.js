@@ -16,13 +16,14 @@ import NewInvestment from "./pages/newInvestment";
 // import CategoryReport from "./pages/report/billTabs/categoryTable";
 // import BillTypeReport from "./pages/report/billTabs/billTypeTable";
 import SalaryReport from "./pages/report/salaryTable";
-import PromotersCapitalReport from "./pages/report/promotersCapitalTable";
+import PromotersCapitalReport from "./pages/report/investorTabs/promotersCapitalTable";
 // import ClimbingIncomeReport from "./pages/report/incomeTabs/climbingIncome";
 // import VisitPassReport from "./pages/report/incomeTabs/visitPassIncome";
 // import MembershipReport from "./pages/report/incomeTabs/membershipIncome";
 import ClimbingIncomeReportTab from "./pages/report/incomeTabs/climbingIncomeReportTab";
 import BillExpenseReportTab from "./pages/report/billTabs/billExpenseReportTab";
 import GearSalesIncomeReportTab from "./pages/report/incomeTabs/gearSaleIncome";
+import InvestorTabs from "./pages/report/investorTabs/investorsReportTab";
 // import Register from "./pages/Register";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoutes from "./PrivateRoutes";
@@ -58,6 +59,7 @@ function App() {
             <Route path="/membershipReport" element={<MembershipReport/>} /> */}
               <Route path="/incomeReportTab" element={<ClimbingIncomeReportTab/>} />
               <Route path="/gearSalesReport" element={<GearSalesIncomeReportTab/>} />
+              <Route path="/investorReportTab" element={<InvestorTabs/>} />
               <Route path="/calendar" element={<Calendar/>} /> 
             </Route>
           </Route>

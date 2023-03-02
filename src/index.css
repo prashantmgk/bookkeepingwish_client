@@ -49,3 +49,11 @@ body,
 li.pro-menu-item::marker{
   background: #1a2438,
 }
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(1)
+          brightness(75%)
+          sepia(100%)
+          saturate(10000%)
+          hue-rotate(180deg)
+}

@@ -22,7 +22,14 @@ mutation Mutation($customerEntryId: ID!) {
       id
    }
 }
-   
 `
 
-export {ADD_CUSTOMER_ENTRY, DELETE_CUSTOMER_ENTRY};
+const UPDATE_CUSTOMER_ENTRY = gql`
+mutation UpdateCustomerEntry($customerEntryId: ID!, $customerEntryInput: CustomerEntryUpdateInput) {
+  updateCustomerEntry(customerEntryId: $customerEntryId, customerEntryInput: $customerEntryInput) {
+    id
+  }
+}
+`  
+
+export {ADD_CUSTOMER_ENTRY, DELETE_CUSTOMER_ENTRY, UPDATE_CUSTOMER_ENTRY};

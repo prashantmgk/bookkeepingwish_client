@@ -8,4 +8,22 @@ mutation Mutation($newInvestorInput: NewInvestorInput) {
   }
 }
 `
-export {ADD_NEW_INVESTOR};
+
+const DELETE_INVESTOR = gql`
+mutation Mutation($newInvestorId: ID!) {
+  deleteNewInvestor(newInvestorId: $newInvestorId) {
+    id
+  }
+}
+
+`
+
+const UPDATE_INVESTOR = gql`
+mutation Mutation($newInvestorId: ID!, $newInvestorInput: NewInvestorUpdateInput) {
+  updateNewInvestor(newInvestorId: $newInvestorId, newInvestorInput: $newInvestorInput) {
+    id
+  }
+}
+`
+
+export {ADD_NEW_INVESTOR, DELETE_INVESTOR, UPDATE_INVESTOR};

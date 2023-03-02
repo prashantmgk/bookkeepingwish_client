@@ -10,6 +10,7 @@ mutation Mutation($promotersCapitalInput: PromotersCapitalInput) {
     accountOrBank
     remainingCapital
     capitalPercentage
+    totalCapital
   }
 }
 `
@@ -20,7 +21,14 @@ mutation DeletePromotersCapital($promotersCapitalId: ID!) {
     id
   }
 }
-
 `
 
-export {ADD_PROMOTERS_CAPITAL, DELETE_PROMOTERS_CAPITAL};
+const UPDATE_PROMOTERS_CAPITAL = gql`
+mutation Mutation($promotersCapitalId: ID!, $promotersCapitalInput: PromotersCapitalUpdateInput) {
+  updatePromotersCapital(promotersCapitalId: $promotersCapitalId, promotersCapitalInput: $promotersCapitalInput) {
+    id
+  }
+}
+`
+
+export {ADD_PROMOTERS_CAPITAL, DELETE_PROMOTERS_CAPITAL, UPDATE_PROMOTERS_CAPITAL};

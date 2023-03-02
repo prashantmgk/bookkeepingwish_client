@@ -32,7 +32,7 @@ const INITIAL_FORM_STATE = {
 const FORM_VALIDATION = Yup.object().shape({
    particular: Yup.string().required("Required"),
    rate: Yup.number().test("check-decimal", "Invalid number, only upto two decimal points", value => numberRegExp.test(value)),
-   quantity: Yup.number().positive("Must be more than 0").integer("Cannot be a decimal").required("Required"),
+   quantity: Yup.number("Must be a number"),
    amount: Yup.number("Must be a number"),
    category: Yup.string().required("Required"),
    remarks: Yup.string().required("Required"),
@@ -55,7 +55,7 @@ const PettyCash = () => {
          panNumber: "",
          vendor: "",
          particular: value.particular,
-         quantity: parseInt(value.quantity),
+         quantity: parseFloat(value.quantity),
          rate: parseFloat(value.rate),
          total: parseFloat(value.amount),
          category: value.category,
@@ -201,7 +201,7 @@ const PettyCash = () => {
                         variant="standard"
                         type="number"
                         label="Amount"
-                        value={values.rate * values.quantity}
+                        value={(values.rate * values.quantity).toFixed(2)}
                         disabled
                         InputLabelProps={{
                            style: { color: colors.grey[100] },

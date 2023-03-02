@@ -1,4 +1,4 @@
-import { Box, IconButton, TextField } from "@mui/material";
+import { Box, IconButton, TextField, Typography } from "@mui/material";
 import Header from "../../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
@@ -11,8 +11,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
-import { DELETE_MEMBERSHIP } from "../../../../mutations/membershipMutation";
+import { DELETE_MEMBERSHIP, UPDATE_MEMBERSHIP} from "../../../../mutations/membershipMutation";
 import { Delete } from "@mui/icons-material";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
@@ -53,11 +54,13 @@ const MembershipReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "name",
          headerName: "Name",
          flex: 3,
+         editable: true,
       },
       {
          field: "category",
@@ -65,6 +68,17 @@ const MembershipReport = () => {
          flex: 2,
          align: "center",
          headerAlign: "center",
+         renderCell: (params) => (
+            <Typography color={colors.greenAccent[500]}>
+              {/* {(params.row.category).toUpperCase()} */}
+               {
+                  params.row.category === "onemonth" ? "One Month" :
+                  params.row.category === "sixmonths" ? "Six Months" :
+                  params.row.category === "twelvemonths" ? "One Year" : params.row.category
+               }
+            </Typography>
+         ),
+            
       },
       {
          field: "charge",
@@ -72,6 +86,8 @@ const MembershipReport = () => {
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
+         type: "number",
       },
       {
          field: "expiryDate",
@@ -81,12 +97,23 @@ const MembershipReport = () => {
          align: "center",
          headerAlign: "center",
       },
+
+      {
+         field: "edit",
+         headerName: "Edit",
+         disableExport: true,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} fiscalYear={fiscalYear}/>
+      },
       
       {
-         field: "action",
-         headerName: "",
+         field: "del",
+         headerName: "Del",
          disableExport: true,
-         width: 80,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -222,9 +249,54 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deleteMembership}
+            action ={deleteMembership}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
+         />
+      </>
+   );
+};
+
+const EditAction = (props) => {
+
+   const { params, fiscalYear } = props;
+   const { id } = params.row;
+
+   const membershipInput = {
+      name: params.row.name,
+      category: params.row.category,
+      remarks: params.row.remarks,
+      date: params.row.date,
+      charge: params.row.charge  || 0,
+      expiryDate: params.row.expiryDate, 
+   }
+
+   const [updateMembership] = useMutation(UPDATE_MEMBERSHIP, {
+      refetchQueries: [ { query: GET_MEMBERSHIPS, variables: { fiscalYear: fiscalYear } } ],
+      variables: { membershipId: id.toString(), membershipInput: membershipInput },
+   });
+    
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateMembership}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
          />
       </>
    );

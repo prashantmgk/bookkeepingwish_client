@@ -21,6 +21,7 @@ query Query($name: String!) {
     accountOrBank
     remainingCapital
     capitalPercentage
+    totalCapital
   }
 }
 `

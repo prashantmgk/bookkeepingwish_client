@@ -12,7 +12,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Delete } from "@mui/icons-material";
-import { DELETE_BILL } from "../../../../mutations/billMutation";
+
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+
+import { DELETE_BILL, UPDATE_BILL } from "../../../../mutations/billMutation";
 
 function CustomToolbar() {
 
@@ -56,6 +59,7 @@ const BillCategoryReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "particular",
@@ -64,6 +68,7 @@ const BillCategoryReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
 
       {
@@ -73,6 +78,7 @@ const BillCategoryReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "quantity",
@@ -81,6 +87,7 @@ const BillCategoryReport = () => {
          type: "number",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "rate",
@@ -89,6 +96,7 @@ const BillCategoryReport = () => {
          type: "number",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "total",
@@ -105,13 +113,25 @@ const BillCategoryReport = () => {
          flex: 5,
          align: "center",
          headerAlign: "center",
+         editable: true,
+      },
+
+      {
+         field: "edit",
+         headerName: "Edit",
+         disableExport: true,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} category={category} fiscalYear={fiscalYear}/>
       },
       
       {
-         field: "action",
-         headerName: "",
+         field: "del",
+         headerName: "Del",
          disableExport: true,
-         width: 80,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -240,7 +260,7 @@ const BillCategoryReport = () => {
                   color: `${colors.greenAccent[200]} !important`,
                },
                '& .MuiDataGrid-columnSeparator': {
-                  color: colors.grey[300],
+                  color: colors.grey[200],
                },
                '& .MuiDataGrid-toolbarContainer': {
                   background: '#e0e0e0',
@@ -289,9 +309,57 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deleteBill}
+            action={deleteBill}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
+         />
+      </>
+   );
+};
+
+
+const EditAction = (props) => {
+
+   const { params, category, fiscalYear} = props;
+   const { id } = params.row;
+   const billInput = {
+      date: params.row.date,
+      panNumber: params.row.panNumber,
+      vendor: params.row.vendor,
+      particular: params.row.particular,
+      quantity: parseFloat(params.row.quantity) || 0,
+      rate: parseFloat(params.row.rate) || 0,
+      total: parseFloat(params.row.quantity * params.row.rate),
+      billsType: params.row.billsType,
+      remarks: params.row.remarks,
+   }
+
+   const [updateBill] = useMutation(UPDATE_BILL, {
+      refetchQueries: [{ query: GET_BILLS_BY_CATEGORY, variables: { category: category, fiscalYear: fiscalYear} }],
+      variables: { billId: id.toString(), billInput: billInput },
+   });
+   
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateBill}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
          />
       </>
    );

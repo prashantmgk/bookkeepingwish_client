@@ -11,8 +11,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
-import { DELETE_VISIT_PASS } from "../../../../mutations/visitPassMutation";
+import { DELETE_VISIT_PASS, UPDATE_VISIT_PASS } from "../../../../mutations/visitPassMutation";
 import { Delete } from "@mui/icons-material";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
@@ -54,11 +55,13 @@ const VisitPassReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "name",
          headerName: "Name",
          flex: 3,
+         editable: true,
       },
       {
          field: "category",
@@ -68,16 +71,23 @@ const VisitPassReport = () => {
          headerAlign: "center",
          renderCell: (params) => (
             <Typography color={colors.greenAccent[500]}>
-              {(`${(params.row.category).toUpperCase()} `)}
+              {/* {(`${(params.row.category).toUpperCase()} `)} */}
+              {
+                  params.row.category === "threedays" ? "Three Days" :
+                  params.row.category === "sevendays" ? "Seven Days" :
+                  params.row.category === "fifteendays" ? "Fifteen Days" : params.row.category
+              }
             </Typography>
-          ),
+         ),
       },
       {
          field: "charge",
          headerName: "Package Charge",
+         type: "number",
          flex: 2,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "expiryDate",
@@ -87,11 +97,22 @@ const VisitPassReport = () => {
          align: "center",
          headerAlign: "center",
       },
+      
       {
-         field: "action",
-         headerName: "",
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} fiscalYear={fiscalYear}/>
+      },
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -228,9 +249,54 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deleteVisitPass}
+            action ={deleteVisitPass}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
+         />
+      </>
+   );
+};
+
+const EditAction = (props) => {
+
+   const { params, fiscalYear } = props;
+   const { id } = params.row;
+
+   const visitPassInput = {
+      name: params.row.name,
+      category: params.row.category,
+      remarks: params.row.remarks,
+      date: params.row.date,
+      charge: params.row.charge || 0,
+      expiryDate: params.row.expiryDate,
+   }
+
+   const [updateVisitPass] = useMutation(UPDATE_VISIT_PASS, {
+      refetchQueries: [ { query: GET_VISIT_PASSES, variables: { fiscalYear: fiscalYear } } ],
+      variables: { visitPassId: id.toString(), visitPassInput: visitPassInput },
+   });
+    
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateVisitPass}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
          />
       </>
    );

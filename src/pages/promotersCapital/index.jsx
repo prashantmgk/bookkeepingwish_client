@@ -86,10 +86,9 @@ const PromotersCapital = () => {
          date: value.date,
          remainingCapital: totalCapital - (promotersCapitalTillNow + value.paidCapital),
          capitalPercentage : (((promotersCapitalTillNow + value.paidCapital) / totalCapital) * 100),
+         totalCapital: totalCapital,
       }
 
-      console.log(promotersCapitalTillNow)
-      console.log(totalCapital)
 
       alert(JSON.stringify(promotersCapitalInput, null, 2));
 

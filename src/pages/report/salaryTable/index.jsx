@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, TextField } from "@mui/material";
+import { Box, Button, IconButton, TextField, Typography } from "@mui/material";
 import Header from "../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../theme";
@@ -12,8 +12,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { DELETE_SALARY } from "../../../mutations/salaryMutation";
+import { DELETE_SALARY, UPDATE_SALARY } from "../../../mutations/salaryMutation";
 import { Delete } from "@mui/icons-material";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../components/Alertbox";
 
 function CustomToolbar() {
@@ -51,6 +52,7 @@ const SalaryReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "employeeName",
@@ -59,6 +61,7 @@ const SalaryReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "position",
@@ -67,10 +70,64 @@ const SalaryReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         renderCell: (params) => (
+            <Typography color={colors.greenAccent[500]}>
+               {
+                  params.row.position === "managingDirector" ? "Managing Director" :
+                  params.row.position === "instructor" ? "Instructor" :
+                  params.row.position === "cleaner" ? "Cleaner" : params.row.position
+               }
+            </Typography>
+         ),
       },
       {
+         field: "baseSalary",
+         headerName: "Base Salary",
+         flex: 2,
+         type: "number",
+         align: "center",
+         headerAlign: "center",
+      },
+
+      {
+         field: "hourlyRate",
+         headerName: "Hourly Rate",
+         flex: 2,
+         type: "number",
+         align: "center",
+         headerAlign: "center",
+      },
+
+      {
+         field: "hoursWorked",
+         headerName: "Hours Worked",
+         flex: 2,
+         type: "number",
+         align: "center",
+         headerAlign: "center",
+      },
+
+      {
+         field: "perBelay",
+         headerName: "Per Belay",
+         flex: 2,
+         type: "number",
+         align: "center",
+         headerAlign: "center",
+      },
+
+      {
+         field: "totalBelay",
+         headerName: "Total Belay",
+         flex: 2,
+         type: "number",
+         align: "center",
+         headerAlign: "center",
+      },
+
+      {
          field: "grandTotal",
-         headerName: "Salary ( Rs )",
+         headerName: "Grand Total",
          flex: 2,
          type: "number",
          align: "center",
@@ -86,10 +143,21 @@ const SalaryReport = () => {
       },
 
       {
-         field: "action",
-         headerName: "",
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} employeeName={name} fiscalYear={fiscalYear}/>
+      },
+
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -254,13 +322,62 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord ={deleteSalary}
+            action ={deleteSalary}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
          />
       </>
    );
 }
+
+const EditAction = (props) => {
+
+   const { params, employeeName, fiscalYear } = props;
+   const { id } = params.row;
+
+   const salaryInput = {
+      date: params.row.date,
+      employeeName: params.row.employeeName,
+      position: params.row.position,
+      particular: params.row.particular,
+      baseSalary: params.row.baseSalary || 0,
+      hourlyRate: params.row.hourlyRate || 0,
+      hoursWorked: params.row.hoursWorked || 0,
+      perBelay: params.row.perBelay || 0,
+      totalBelay: params.row.totalBelay || 0,
+      charges: params.row.charges || 0,
+   }
+
+   const [updateSalary] = useMutation(UPDATE_SALARY, {
+      refetchQueries: [{ query: GET_SALARY_BY_EMPLOYEE_NAME, variables: {employeeName, fiscalYear} }],
+      variables: { salaryId: id.toString(), salaryInput: salaryInput },
+   });
+    
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateSalary}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
+         />
+      </>
+   );
+};
 
 
 export default SalaryReport;

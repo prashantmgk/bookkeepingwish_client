@@ -128,7 +128,7 @@ export const report = [
          {
             icon: <SavingsOutlinedIcon />,
             title: "Investors",
-            to: "/investorReport"
+            to: "/investorReportTab"
          },
          {
             icon: <PaymentsOutlinedIcon />,

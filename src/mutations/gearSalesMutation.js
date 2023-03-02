@@ -21,5 +21,12 @@ mutation Mutation($gearSalesId: ID!) {
 }
 `
 
-export { ADD_GEAR_SALES_ENTRY, DELETE_GEAR_SALES_ENTRY};
+const UPDATE_GEAR_SALES_ENTRY = gql`
+mutation Mutation($gearSalesId: ID!, $gearSalesInput: GearSalesUpdateInput) {
+  updateGearSales(gearSalesId: $gearSalesId, gearSalesInput: $gearSalesInput) {
+    id
+  }
+}
+`
+export { ADD_GEAR_SALES_ENTRY, DELETE_GEAR_SALES_ENTRY, UPDATE_GEAR_SALES_ENTRY};
 

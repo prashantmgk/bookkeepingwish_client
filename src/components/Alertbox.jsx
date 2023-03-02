@@ -14,10 +14,15 @@ const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide({deleteRecord, open, handleClose}) {
+export default function AlertDialogSlide({action, open, handleClose, dialogTitle}) {
 
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+
+   const handleSubmit = () => {
+      action();
+      handleClose();
+   }
 
    return (
       <div>
@@ -34,7 +39,7 @@ export default function AlertDialogSlide({deleteRecord, open, handleClose}) {
                },
             }}
          >
-         <DialogTitle>{"Deleting the following record"}</DialogTitle>
+         <DialogTitle>{dialogTitle}</DialogTitle>
          <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
                Are you sure?
@@ -58,7 +63,7 @@ export default function AlertDialogSlide({deleteRecord, open, handleClose}) {
                },
                background: colors.redAccent[600],
             }}
-            onClick={deleteRecord}>Yes</Button>
+            onClick={handleSubmit}>Yes</Button>
          </DialogActions>
          </Dialog>
       </div>

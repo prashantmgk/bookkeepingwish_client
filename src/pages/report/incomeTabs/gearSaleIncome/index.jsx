@@ -12,7 +12,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import { Delete } from "@mui/icons-material";
-import { DELETE_GEAR_SALES_ENTRY } from "../../../../mutations/gearSalesMutation";
+import { DELETE_GEAR_SALES_ENTRY, UPDATE_GEAR_SALES_ENTRY } from "../../../../mutations/gearSalesMutation";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../../components/Alertbox";
 
 function CustomToolbar() {
@@ -55,19 +56,23 @@ const GearSalesIncomeReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "item",
          headerName: "Items",
          flex: 4,
+         editable: true,
          // cellClassName: "name-column--cell",
       },
       {
          field: "quantity",
          headerName: "Quantity",
-         flex: 4,
+         flex: 2,
+         editable: true,
          // cellClassName: "name-column--cell",
          align: "center",
+         type: "number",
          headerAlign: "center",
       },
       {
@@ -76,20 +81,34 @@ const GearSalesIncomeReport = () => {
          flex: 2,
          align: "center",
          headerAlign: "center",
+         type: "number",
+         editable: true,
       },
       {
          field: "amount",
          headerName: "Total Amount",
          flex: 2,
+         type: "number",
          align: "center",
          headerAlign: "center",
       },
 
       {
-         field: "action",
-         headerName: "",
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} fiscalYear={fiscalYear}/>
+      },
+
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
@@ -224,13 +243,58 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord={deleteGearSales}
+            action={deleteGearSales}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
          />
       </>
    );
 };
 
+
+const EditAction = (props) => {
+
+   const { params, fiscalYear } = props;
+   const { id } = params.row;
+   const gearSalesInput = {
+      item: params.row.item,
+      quantity: params.row.quantity  || 0,
+      rate: params.row.rate || 0,
+      amount: (params.row.quantity * params.row.rate),
+      remarks: params.row.remarks,
+      date: params.row.date,
+   }
+
+
+   const [updateGearSales] = useMutation(UPDATE_GEAR_SALES_ENTRY, {
+      refetchQueries: [{query: GET_GEAR_SALES, variables: { fiscalYear: fiscalYear }}],
+      variables: { gearSalesId: id.toString(), gearSalesInput: gearSalesInput },
+   });
+    
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateGearSales}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
+         />
+      </>
+   );
+};
 
 export default GearSalesIncomeReport;

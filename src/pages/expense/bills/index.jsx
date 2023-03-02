@@ -39,7 +39,7 @@ const FORM_VALIDATION = Yup.object().shape({
    vendor: Yup.string().required("Required"),
    particular: Yup.string().required("Required"),
    rate: Yup.number().test("check-decimal", "Invalid number, only upto two decimal points", value => numberRegExp.test(value)),
-   quantity: Yup.number().positive("Must be more than 0").integer("Cannot be a decimal").required("Required"),
+   quantity: Yup.number("Must be a number"),
    amount: Yup.number("Must be a number"),
    category: Yup.string().required("Required"),
    billsType: Yup.string().required("Required"),
@@ -63,7 +63,7 @@ const VatBill = () => {
          panNumber: value.panNumber,
          vendor: value.vendor,
          particular: value.particular,
-         quantity: parseInt(value.quantity),
+         quantity: parseFloat(value.quantity),
          rate: parseFloat(value.rate),
          total: parseFloat(value.amount),
          category: value.category,
@@ -291,7 +291,7 @@ const VatBill = () => {
                fullWidth
                variant="standard"
                type="number"
-               value={(values.quantity * values.rate)}   
+               value={(values.quantity * values.rate).toFixed(2)}   
                label="Amount"
                disabled
                InputLabelProps={{

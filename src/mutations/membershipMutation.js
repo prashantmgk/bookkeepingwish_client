@@ -22,4 +22,12 @@ mutation Mutation($membershipId: ID!) {
 }
 `
 
-export {ADD_MEMBERSHIP, DELETE_MEMBERSHIP};
+const UPDATE_MEMBERSHIP = gql`
+mutation Mutation($membershipId: ID!, $membershipInput: MembershipUpdateInput) {
+  updateMembership(membershipId: $membershipId, membershipInput: $membershipInput) {
+    id
+  }
+}
+`
+
+export {ADD_MEMBERSHIP, DELETE_MEMBERSHIP, UPDATE_MEMBERSHIP};

@@ -5,11 +5,11 @@ import { useTheme } from "@mui/material";
 import { useState } from "react";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_BILLS_BY_TYPE} from "../../../../queries/billQueries";
-import { DELETE_BILL } from "../../../../mutations/billMutation";
+import { DELETE_BILL, UPDATE_BILL } from "../../../../mutations/billMutation";
 import LoadingScreen from "../../../../components/Backdrop";
 import AlertDialogSlide from "../../../../components/Alertbox";
 import { Delete } from '@mui/icons-material';
-
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -57,6 +57,7 @@ const BillTypeReport = () => {
          type: "date",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "particular",
@@ -65,6 +66,7 @@ const BillTypeReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "vendor",
@@ -73,6 +75,7 @@ const BillTypeReport = () => {
          cellClassName: "name-column--cell",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "quantity",
@@ -81,6 +84,7 @@ const BillTypeReport = () => {
          type: "number",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "rate",
@@ -89,6 +93,7 @@ const BillTypeReport = () => {
          type: "number",
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       {
          field: "total",
@@ -118,18 +123,30 @@ const BillTypeReport = () => {
          flex: 5  ,
          align: "center",
          headerAlign: "center",
+         editable: true,
       },
       
       {
-         field: "action",
-         headerName: "",
+         field: "edit",
+         headerName: "Edit",
          disableExport: true,
-         width: 80,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <EditAction {...{params}} billType={billType} fiscalYear={fiscalYear}/>
+      },
+
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
          sortable: false,
          align: "center",
          headerAlign: "center",
          renderCell: (params) => <DeleteAction id={params.row.id} billType={billType} fiscalYear={fiscalYear} />
-      }    
+      },
    ];
 
    if (loading) return <LoadingScreen/>;
@@ -243,7 +260,7 @@ const BillTypeReport = () => {
                   color: `${colors.greenAccent[200]} !important`,
                },
                '& .MuiDataGrid-columnSeparator': {
-                  color: colors.grey[300],
+                  color: colors.grey[200],
                },
                '& .MuiDataGrid-toolbarContainer': {
                   background: '#e0e0e0',
@@ -290,13 +307,59 @@ const DeleteAction = (props) => {
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            deleteRecord={deleteBill}
+            action={deleteBill}
             open={open}
             handleClose={handleClose}
+            dialogTitle="Deleting the following record"
          />
       </>
    );
 };
 
+const EditAction = (props) => {
+
+   const { params, billType, fiscalYear } = props;
+   const { id } = params.row;
+   const billInput = {
+      date: params.row.date,
+      panNumber: params.row.panNumber,
+      vendor: params.row.vendor,
+      particular: params.row.particular,
+      quantity: parseFloat(params.row.quantity) || 0,
+      rate: parseFloat(params.row.rate) || 0,
+      total: parseFloat(params.row.quantity * params.row.rate),
+      category: params.row.category,
+      remarks: params.row.remarks,
+   }
+
+   const [updateBill] = useMutation(UPDATE_BILL, {
+      refetchQueries : [{ query: GET_BILLS_BY_TYPE, variables: { billsType: billType, fiscalYear }}],
+      variables: { billId: id.toString(), billInput: billInput },
+   });
+   
+   const [open, setOpen] = useState(false);
+
+   const handleClose = () => {
+      setOpen(false);
+   };
+
+   const handleEdit = () => {
+      setOpen(true);
+   };
+
+   return (
+      <>
+         <IconButton onClick={handleEdit}>
+            <SaveOutlinedIcon />
+         </IconButton>
+         <AlertDialogSlide 
+            action={updateBill}
+            open={open}
+            handleClose={handleClose}
+            dialogTitle="Updating the following record"
+         />
+      </>
+   );
+};
 
 export default BillTypeReport;
