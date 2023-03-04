@@ -72,10 +72,10 @@ export default function BillExpenseReportTab() {
          </Tabs>
          </Box>
          <TabPanel value={value} index={0}>
-            <PromotersCapitalTable />
+            <InvestorTable />
          </TabPanel>
          <TabPanel value={value} index={1}>
-            <InvestorTable />
+            <PromotersCapitalTable />
          </TabPanel>
       </Box>
    );

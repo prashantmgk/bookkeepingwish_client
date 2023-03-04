@@ -1,17 +1,21 @@
-import { Box, IconButton} from "@mui/material";
+import { IconButton} from "@mui/material";
+import {Box} from "@mui/material";
 import Header from "../../../../components/Header";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid';
 import { tokens } from "../../../../theme";
 import { useTheme } from "@mui/material";
 import { useState } from "react";
-import { useMutation, useQuery} from "@apollo/client";
+// import { useLazyQuery} from "@apollo/client";
+import {useQuery, useMutation} from "@apollo/client";
 import {GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME } from "../../../../queries/investorQueries";
+// import { GET_PROMOTERS_CAPITAL_BY_NAME, GET_INVESTOR_BY_ID } from "../../../../queries/investorQueries";
 import { Delete } from "@mui/icons-material";
 import LoadingScreen from "../../../../components/Backdrop";
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+// import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import AlertDialogSlide from "../../../../components/Alertbox";
-import { DELETE_INVESTOR, UPDATE_INVESTOR } from "../../../../mutations/newInvestor";
-import { UPDATE_PROMOTERS_CAPITAL } from "../../../../mutations/promotersCapitalMutation";
+import { DELETE_INVESTOR, DELETE_ALL_PROMOTERS_CAPITAL_BY_NAME } from "../../../../mutations/newInvestor";
+// import { UPDATE_INVESTOR } from "../../../../mutations/newInvestor";
+// import { UPDATE_PROMOTERS_CAPITAL_BY_NAME } from "../../../../mutations/promotersCapitalMutation";
 
 function CustomToolbar() {
    return (
@@ -43,7 +47,7 @@ const PromotersCapitalReport = () => {
          flex: 4,
          align: "left",
          headerAlign: "left",
-         editable: true,
+         editable: false,
       },
       {
          field: "totalCapital",
@@ -52,7 +56,7 @@ const PromotersCapitalReport = () => {
          align: "left",
          headerAlign: "left",
          type: "number",
-         editable: true,
+         editable: false,
       },
 
       // {
@@ -66,16 +70,16 @@ const PromotersCapitalReport = () => {
       //    renderCell: (params) => <EditAction {...{params}} id={params.row.id}/>
       // },
       
-      // {
-      //    field: "del",
-      //    headerName: "Del",
-      //    disableExport: true,
-      //    width: 20,
-      //    sortable: false,
-      //    align: "center",
-      //    headerAlign: "center",
-      //    renderCell: (params) => <DeleteAction id={params.row.id}/>
-      // }    
+      {
+         field: "del",
+         headerName: "Del",
+         disableExport: true,
+         width: 20,
+         sortable: false,
+         align: "center",
+         headerAlign: "center",
+         renderCell: (params) => <DeleteAction id={params.row.id} name={params.row.name}/>
+      }    
    ]
 
    if (investorDataLoading) return <LoadingScreen/>;
@@ -154,13 +158,18 @@ const PromotersCapitalReport = () => {
 }
 
 const DeleteAction = (props) => {
-   const { id } = props;
+   const { id, name } = props;
 
    const [deleteNewInvestor] = useMutation(DELETE_INVESTOR, {
       refetchQueries: [ { query: GET_INVESTORS } ],
       variables: { newInvestorId: id.toString() },
    });
 
+   const [deleteAllPromotersCapitalByName] = useMutation(DELETE_ALL_PROMOTERS_CAPITAL_BY_NAME, {
+      refetchqueries: [ { query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: { name: name }} ],
+      variables: { name: name },
+   });
+   
    const [open, setOpen] = useState(false);
 
    const handleClose = () => {
@@ -171,13 +180,19 @@ const DeleteAction = (props) => {
       setOpen(true);
    }; 
 
+   const handleAction = () =>
+   {
+      deleteNewInvestor();
+      deleteAllPromotersCapitalByName();
+   }
+
    return (
       <>
          <IconButton onClick={handleDelete}>
             <Delete />
          </IconButton>
          <AlertDialogSlide 
-            action ={deleteNewInvestor}
+            action ={handleAction}
             open={open}
             handleClose={handleClose}
             dialogTitle="Deleting the following record"
@@ -191,18 +206,35 @@ const DeleteAction = (props) => {
 //    const { params } = props;
 //    const { id } = params.row;
 
+//    const [investorName, setInvestorName] = useState(params.row.name);
+
 //    const newInvestorInput = {
 //       name: params.row.name,
 //       totalCapital: params.row.totalCapital,
 //    }
+
+//    // const {loading, data} = useLazyQuery(GET_INVESTOR_BY_ID, {
+//    //    variables: { newInvestorId: id.toString() },
+//    // });
+
+//    const [investorNameCall, { loading, data}] = useLazyQuery(GET_INVESTOR_BY_ID, {
+//       variables: {investorId: id.toString()},
+//       onCompleted: (data) => {
+//          setInvestorName(data.newInvestor.name);
+//       }
+//    },[investorName]);
+
+//    const skipI = data ? true : false;
 
 //    const [updateNewInvestor] = useMutation(UPDATE_INVESTOR, {
 //       refetchQueries: [ { query: GET_INVESTORS } ],
 //       variables: { newInvestorId: id.toString(), newInvestorInput: newInvestorInput },
 //    });
    
-//    const [updatePromotersCapital] = useMutation(UPDATE_PROMOTERS_CAPITAL, {
+//    const [updatePromotersCapitalByName] = useMutation(UPDATE_PROMOTERS_CAPITAL_BY_NAME, {
 //       refetchQueries: [ { query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: { name: params.row.name } } ],
+//       variables: { name: investorName, promotersCapitalInput: newInvestorInput},
+//       skip: !skipI
 //    });
    
 //    const [open, setOpen] = useState(false);
@@ -216,9 +248,12 @@ const DeleteAction = (props) => {
 //    };
 
 //    const handleUpdate = () => {
+//       investorNameCall();  
+//       updatePromotersCapitalByName();
 //       updateNewInvestor();
-//       updatePromotersCapital();
 //    }
+
+//    if (loading) return <LoadingScreen/>;
 
 //    return (
 //       <>

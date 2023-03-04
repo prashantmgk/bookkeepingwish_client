@@ -31,4 +31,12 @@ mutation Mutation($promotersCapitalId: ID!, $promotersCapitalInput: PromotersCap
 }
 `
 
-export {ADD_PROMOTERS_CAPITAL, DELETE_PROMOTERS_CAPITAL, UPDATE_PROMOTERS_CAPITAL};
+const UPDATE_PROMOTERS_CAPITAL_BY_NAME = gql`
+mutation UpdatePromotersCapitalByName($name: String!, $promotersCapitalInput: PromotersCapitalUpdateInput) {
+  updatePromotersCapitalByName(name: $name, promotersCapitalInput: $promotersCapitalInput) {
+    name
+  }
+}
+`
+
+export {ADD_PROMOTERS_CAPITAL, DELETE_PROMOTERS_CAPITAL, UPDATE_PROMOTERS_CAPITAL, UPDATE_PROMOTERS_CAPITAL_BY_NAME};

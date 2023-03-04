@@ -97,6 +97,7 @@ const PromotersCapital = () => {
          //USE REFETCH QUERIES LATER
          refetchQueries: [
             {query: GET_PROMOTERS_CAPITAL_TILL_NOW, variables: {name: investorName}},
+            {query: GET_PROMOTERS_CAPITAL_BY_NAME, variables: {name: investorName}},
          ],
       });
       resetForm({values: INITIAL_FORM_STATE});
@@ -193,7 +194,32 @@ const PromotersCapital = () => {
                                  borderColor: colors.grey[100]
                               }
                            },
-                           gridColumn: "span 6" 
+                           gridColumn: "span 8" 
+                        }}
+                     />
+
+                     <TextField
+                        fullWidth
+                        variant="standard"
+                        type="text"
+                        label="Investment Capital"
+                        value={totalCapital.toLocaleString('en-US')}
+                        disabled
+                        InputLabelProps={{
+                           style: { color: colors.grey[100] },
+                        }}
+
+                        InputProps={{
+                           startAdornment: <InputAdornment position="start">Rs.</InputAdornment>,
+                        }}
+                        
+                        sx={{
+                        "& .MuiOutlinedInput-root": { 
+                              "&.Mui-focused fieldset": {
+                                 borderColor: colors.grey[100]
+                              }
+                           },
+                           gridColumn: "span 4" 
                         }}
                      />
 
@@ -243,7 +269,7 @@ const PromotersCapital = () => {
                                  borderColor: colors.grey[100]
                               }
                            },
-                           gridColumn: "span 12" 
+                           gridColumn: "span 6" 
                         }}
                      />
 

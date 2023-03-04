@@ -26,4 +26,11 @@ mutation Mutation($newInvestorId: ID!, $newInvestorInput: NewInvestorUpdateInput
 }
 `
 
-export {ADD_NEW_INVESTOR, DELETE_INVESTOR, UPDATE_INVESTOR};
+const DELETE_ALL_PROMOTERS_CAPITAL_BY_NAME = gql`
+mutation DeleteAllPromotersCapitalByName($name: String!) {
+  deleteAllPromotersCapitalByName(name: $name) {
+    name
+  }
+}
+`
+export {ADD_NEW_INVESTOR, DELETE_INVESTOR, UPDATE_INVESTOR,DELETE_ALL_PROMOTERS_CAPITAL_BY_NAME};

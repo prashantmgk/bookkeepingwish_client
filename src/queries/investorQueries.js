@@ -36,9 +36,19 @@ query Query($name: String!) {
 }
 `
 
+const GET_INVESTOR_BY_ID = gql`
+query Query($investorId: ID!) {
+  getNewInvestorById(investorId: $investorId) {
+    name
+  }
+}
+
+`
+
+
 const GET_PROMOTERS_CAPITAL_TILL_NOW = gql`
 query Query($name: String!) {
   getPromotersPaidCapitalTillNowByName(name: $name)
 }
 `
-export { GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME, GET_PROMOTERS_CAPITAL_TILL_NOW, GET_INVESTOR_BY_NAME}
+export { GET_INVESTORS, GET_PROMOTERS_CAPITAL_BY_NAME, GET_PROMOTERS_CAPITAL_TILL_NOW, GET_INVESTOR_BY_NAME, GET_INVESTOR_BY_ID}

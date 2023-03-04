@@ -55,7 +55,7 @@ const NewInvestment = () => {
          }}
       >
         
-         <Header title="New Investment" subtitle="Recording the Capital amount investor raise throught the fiscal year." />
+         <Header title="New Investor" subtitle="Recording the Capital amount investor raise throught the fiscal year." />
          <Formik
             onSubmit={handleFormSubmit}
             initialValues={INITIAL_FORM_STATE}
