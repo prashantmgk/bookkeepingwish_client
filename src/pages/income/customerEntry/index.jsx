@@ -50,16 +50,16 @@ const CustomerEntry = () => {
    const handleFormSubmit = (value, {resetForm}) => {
 
       alert(JSON.stringify(value, null, 2));
-      const total =(value.wallCharge + value.belay + value.shoesRent + value.harnessRent + value.chalk + value.rope);
+      const total = getTotal(value);
 
       const customerEntryInput = {
          name: value.name,
-         wallCharge: value.wallCharge,
-         belay: value.belay,
-         shoesRent: value.shoesRent,
-         harnessRent: value.harnessRent,
-         chalk: value.chalk,
-         rope: value.rope,
+         wallCharge: value.wallCharge || 0,
+         belay: value.belay || 0,
+         shoesRent: value.shoesRent || 0,
+         harnessRent: value.harnessRent || 0,
+         chalk: value.chalk || 0,
+         rope: value.rope || 0,
          remarks: value.remarks,
          date: value.date,
          total: parseFloat(total),
@@ -81,6 +81,20 @@ const CustomerEntry = () => {
         return (currentYear - 1).toString();
       }
    }
+
+   
+   function getTotal (value) {
+      const wallCharge = value.wallCharge || 0;
+      const belay = value.belay || 0;
+      const shoesRent = value.shoesRent || 0;
+      const harnessRent = value.harnessRent || 0;
+      const chalk = value.chalk || 0;
+      const rope = value.rope || 0;
+
+      const total = wallCharge + belay + shoesRent + harnessRent + chalk + rope;
+      return total;
+   }
+
 
    const [addCustomerEntry, {loading}] = useMutation(ADD_CUSTOMER_ENTRY, {
       refetchQueries: [{query: GET_CUSTOMER_ENTRIES, variables: {fiscalYear: getFiscalYear(values.date)}}],
@@ -323,7 +337,7 @@ const CustomerEntry = () => {
                         variant="standard"
                         type="number"
                         label="Total"
-                        value={(values.wallCharge + values.belay + values.shoesRent + values.harnessRent + values.chalk + values.rope)}
+                        value={getTotal(values)}
                         disabled
                         InputLabelProps={{
                            style: { color: colors.grey[100] },
